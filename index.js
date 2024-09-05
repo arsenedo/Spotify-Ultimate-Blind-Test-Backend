@@ -13,6 +13,7 @@ const game = new Game();
 // WebSocket event handling
 wss.on('connection', (ws) => {
   console.log('A new client connected.');
+  console.log("test commit");
 
   // Event listener for incoming messages
   ws.on('message', (e) => {
