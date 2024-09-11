@@ -2,6 +2,11 @@ class Game {
     players = [];
     isStarted = false;
 
+    constructor(host, code) {
+        this.code = code;
+        this.host = host;
+    }
+
     /**
      * Adds a player to the game
      * @param {Player} player 
