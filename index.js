@@ -13,14 +13,13 @@ const games = [];
 
 // WebSocket event handling
 wss.on("connection", (ws) => {
-
   // Event listener for incoming messages
   ws.on("message", (e) => {
     const response = {
-      code : "500",
-      msg : "internal server error",
-      data : {}
-    }
+      code: "500",
+      msg: "internal server error",
+      data: {},
+    };
     const data = JSON.parse(e);
     const payload = data.payload;
 
@@ -43,13 +42,17 @@ wss.on("connection", (ws) => {
         }
 
         const player = new Player(game.players.length, payload.name, ws);
-        
+
         game.addPlayer(player);
 
         // Broadcast the new player to everyone in the game
         for (const player of game.players) {
+          const playerNames = game.players.map((item) => item.name);
           // Response
-          updateResponse(200, "A new player was created", { action : data.action, newPlayer : payload.name });
+          updateResponse(200, "A new player was created", {
+            action: data.action,
+            players: playerNames,
+          });
 
           player.ws.send(JSON.stringify(response));
         }
@@ -62,29 +65,50 @@ wss.on("connection", (ws) => {
         games.push(game);
 
         // Response
-        updateResponse(200, "Created a game successfully!", { action : data.action, code });
-        
+        updateResponse(200, "Created a game successfully!", {
+          action: data.action,
+          code,
+        });
+
         ws.send(JSON.stringify(response));
 
+        break;
+      case "startGame":
+        game = games.find((game) => game.code === payload.code);
+        if (!game) {
+          updateResponse(404, "Game not found", {});
+          ws.send(JSON.stringify(response));
+          return;
+        }
+
+        if (game.players.length < 2) {
+          updateResponse(403, "Not enough players to start the game", {});
+          ws.send(JSON.stringify(response));
+          return;
+        }
+
+        updateResponse(200, "Game has started!", { action : data.action, isStarted: true });
+        for (const player of game.players) {
+          player.ws.send(JSON.stringify(response));
+        }
         break;
     }
   });
 
-  	// Utils
-	const generateCode = () => {
-		const numbers = 5;
-		let code = '';
-		for (let i = 0; i < numbers; i++) {
-			if (i === 0) {
-				code += Math.floor(Math.random() * 9) + 1;
-				continue;
-			}
-			code += Math.floor(Math.random() * 10);
-		}
-		return code;
-	};
-	// End utils
-
+  // Utils
+  const generateCode = () => {
+    const numbers = 5;
+    let code = "";
+    for (let i = 0; i < numbers; i++) {
+      if (i === 0) {
+        code += Math.floor(Math.random() * 9) + 1;
+        continue;
+      }
+      code += Math.floor(Math.random() * 10);
+    }
+    return code;
+  };
+  // End utils
 
   // Event listener for client disconnection
   ws.on("close", () => {
