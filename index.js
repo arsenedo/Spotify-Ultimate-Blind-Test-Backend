@@ -26,6 +26,12 @@ wss.on("connection", (ws) => {
 
     let game;
 
+    const updateResponse = (code, msg, data) => {
+      response.code = code;
+      response.msg = msg;
+      response.data = data;
+    };
+
     switch (data.action) {
       case "registerPlayer":
         game = games.find((game) => game.code === payload.code);
@@ -36,15 +42,16 @@ wss.on("connection", (ws) => {
           break;
         }
 
-        const player = new Player(game.players.length, data.payload.name, ws);
+        const player = new Player(game.players.length, payload.name, ws);
         
         game.addPlayer(player);
 
-        // Broadcast players to everyone in the game
+        // Broadcast the new player to everyone in the game
         for (const player of game.players) {
-          const playerNames = game.players.map((p) => p.name);
-          
-          player.ws.send(JSON.stringify(playerNames));
+          // Response
+          updateResponse(200, "A new player was created", { action : data.action, newPlayer : payload.name });
+
+          player.ws.send(JSON.stringify(response));
         }
         break;
       case "registerHost":
@@ -55,9 +62,7 @@ wss.on("connection", (ws) => {
         games.push(game);
 
         // Response
-        response.code = 200;
-        response.msg = "Created a game succesfully!"
-        response.data = { action : data.action, code };
+        updateResponse(200, "Created a game successfully!", { action : data.action, code });
         
         ws.send(JSON.stringify(response));
 

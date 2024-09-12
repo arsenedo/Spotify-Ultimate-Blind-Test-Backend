@@ -5,6 +5,8 @@ class Game {
     constructor(host, code) {
         this.code = code;
         this.host = host;
+
+        this.addPlayer(this.host);
     }
 
     /**
