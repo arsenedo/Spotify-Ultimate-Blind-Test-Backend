@@ -22,6 +22,19 @@ class Game {
         return false;
     }
 
+    arePlayersReady() {
+        return this.players.filter((player) => !player.ready).length === 0
+    }
+
+    setReady(playerName) {
+        const player = this.players.find((player) => player.name.toLowerCase() === playerName.toLowerCase())
+        if(player) {
+            player.ready = true;
+            return true;
+        }
+        return false;
+    }
+
     startGame() {
         this.isStarted = true;
     }

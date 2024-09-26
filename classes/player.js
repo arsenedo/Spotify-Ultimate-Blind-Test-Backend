@@ -1,6 +1,7 @@
 class Player {
     id;
-    score;
+    score = 0;
+    ready = false;
     constructor(id, name, ws) {
         this.id = id;
         this.name= name;

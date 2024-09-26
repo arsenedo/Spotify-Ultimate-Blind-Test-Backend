@@ -52,6 +52,7 @@ wss.on("connection", (ws) => {
           updateResponse(200, "A new player was created", {
             action: data.action,
             players: playerNames,
+            code : payload.code,
           });
 
           player.ws.send(JSON.stringify(response));
@@ -87,11 +88,32 @@ wss.on("connection", (ws) => {
           return;
         }
 
-        updateResponse(200, "Game has started!", { action : data.action, isStarted: true });
+        updateResponse(200, "Game has started!", {
+          action: data.action,
+          isStarted: true,
+        });
         for (const player of game.players) {
           player.ws.send(JSON.stringify(response));
         }
         break;
+      case "playerReady":
+        game = games.find((game) => game.code === payload.code);
+        if (!game) {
+          updateResponse(404, "Game not found", { action: "error", code : payload.code });
+          ws.send(JSON.stringify(response));
+          return;
+        }
+        if (game.setReady(payload.name)) {
+          updateResponse(200, "Player ready!", { action: data.action, name: payload.name });
+          ws.send(JSON.stringify(response));
+          return;
+        }
+        updateResponse(404, "Couldn't update the players ready state!", {
+          action: "error",
+          name: payload.name,
+        });
+        ws.send(JSON.stringify(response));
+        return;
     }
   });
 
