@@ -6,6 +6,8 @@ node_modules
 !.env.example
 !.env.test
 
+authToken.json
+
 .vscode
 .fleet
 .idea
