@@ -1,6 +1,10 @@
 node_modules
 
-.end
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
 
 .vscode
 .fleet
