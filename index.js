@@ -14,7 +14,8 @@ const wss = new WebSocket.Server({ port: 8080 });
 const games = [];
 
 const spotify = new Spotify(process.env.CLIENT_ID, process.env.SECRET);
-console.log(spotify.clientId, spotify.secret)
+spotify.getNewAuthToken();
+
 
 // WebSocket event handling
 wss.on("connection", (ws) => {
