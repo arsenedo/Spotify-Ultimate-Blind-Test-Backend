@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require("express");
 const WebSocket = require("ws");
 const Player = require("./classes/player.js");
 const Game = require("./classes/game.js");
+const Spotify = require("./classes/spotify.js");
 const app = express();
 const port = 3000;
 
@@ -10,6 +12,9 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 // Array with all games
 const games = [];
+
+const spotify = new Spotify(process.env.CLIENT_ID, process.env.SECRET);
+console.log(spotify.clientId, spotify.secret)
 
 // WebSocket event handling
 wss.on("connection", (ws) => {

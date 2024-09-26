@@ -1,4 +1,9 @@
 class Spotify {
-    client_id = process.env.CLIENT_ID;
-    secret = process.env.SECRET;
+    constructor(clientId, secret) {
+        this.clientId = clientId;
+        this.secret = secret;
+    }
 }
+
+
+module.exports = Spotify
