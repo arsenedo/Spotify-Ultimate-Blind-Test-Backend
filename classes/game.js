@@ -1,7 +1,7 @@
 class Game {
   players = [];
   albums = [];
-  isStarted = false;
+  isStarted = false; // Counts as started when the host starts the data pick sequence
 
   constructor(host, code) {
     this.code = code;
@@ -27,12 +27,23 @@ class Game {
     return this.players.filter((player) => !player.ready).length === 0;
   }
 
+  arePlayersLoaded() {
+    return this.players.filter((player) => !player.loaded).length === 0;
+  }
+
   setReady(playerName) {
-    const player = this.players.find(
-      (player) => player.name.toLowerCase() === playerName.toLowerCase()
-    );
+    const player = this.getPlayer(playerName)
     if (player) {
       player.ready = true;
+      return true;
+    }
+    return false;
+  }
+
+  setLoaded(playerName) {
+    const player = this.getPlayer(playerName);
+    if (player) {
+      player.loaded = true;
       return true;
     }
     return false;
@@ -52,6 +63,13 @@ class Game {
       existingAlbums.push(newAlbum);
     }
     return existingAlbums;
+  }
+
+  getPlayer(name) {
+    const player = this.players.find(
+      (player) => player.name.toLowerCase() === name.toLowerCase()
+    );
+    return player;
   }
 }
 

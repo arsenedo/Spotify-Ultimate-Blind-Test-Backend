@@ -93,6 +93,8 @@ wss.on("connection", (ws) => {
           return;
         }
 
+        game.startGame();
+
         updateResponse(200, "Game has started!", {
           action: data.action,
           isStarted: true,
@@ -119,6 +121,16 @@ wss.on("connection", (ws) => {
             name: payload.name,
           });
           ws.send(JSON.stringify(response));
+
+          // Check if all players ready
+          if (game.arePlayersReady()) {
+            updateResponse(200, "All players are ready!", {
+              action: "allReady",
+            });
+            for (const player of game.players) {
+              player.ws.send(JSON.stringify(response));
+            }
+          }
           return;
         }
 
@@ -127,19 +139,54 @@ wss.on("connection", (ws) => {
           name: payload.name,
         });
         ws.send(JSON.stringify(response));
-        return;
+        break;
 
       case "appendAlbums":
-        game = games.find((game) => game.code === payload.code);
+        game = findGame(payload.code);
         const existingAlbums = game.pushAlbums(payload.albums);
         console.log(existingAlbums)
         existingAlbums.length === 0
           ? updateResponse(200, "All albums added!", { action: data.action })
           : updateResponse(
-              207,
-              `${existingAlbums.length} albums were not added`,
-              { action: data.action, existingAlbums }
-            );
+            207,
+            `${existingAlbums.length} albums were not added`,
+            { action: data.action, existingAlbums }
+          );
+        ws.send(JSON.stringify(response));
+        break;
+
+      case "playerLoaded":
+        game = findGame(payload.code);
+        if (!game) {
+          updateResponse(404, "Game not found", {
+            action: "error",
+            code: payload.code,
+          });
+          ws.send(JSON.stringify(response));
+          return;
+        }
+
+        if(game.setPlayerLoaded(payload.name)) {
+          updateResponse(200, "Player loaded successfuly!", {action : data.action});
+          ws.send(JSON.stringify(response));
+
+          // Check if all players loaded
+          if (game.arePlayersLoaded()) {
+            updateResponse(200, "All players are ready!", {
+              action: "allReady",
+            });
+            for (const player of game.players) {
+              player.ws.send(JSON.stringify(response));
+            }
+          }
+
+          return
+        }
+
+        updateResponse(404, "Couldn't update the players loaded state!", {
+          action: "error",
+          name: payload.name,
+        });
         ws.send(JSON.stringify(response));
         break;
     }
@@ -158,6 +205,10 @@ wss.on("connection", (ws) => {
     }
     return code;
   };
+
+  const findGame = (code) => {
+    return games.find((game) => game.code === code);
+  }
   // End utils
 
   // Event listener for client disconnection
