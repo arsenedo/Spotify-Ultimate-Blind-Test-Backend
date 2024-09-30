@@ -103,6 +103,7 @@ wss.on("connection", (ws) => {
         break;
       case "playerReady":
         game = games.find((game) => game.code === payload.code);
+
         if (!game) {
           updateResponse(404, "Game not found", {
             action: "error",
@@ -111,6 +112,7 @@ wss.on("connection", (ws) => {
           ws.send(JSON.stringify(response));
           return;
         }
+
         if (game.setReady(payload.name)) {
           updateResponse(200, "Player ready!", {
             action: data.action,
@@ -119,6 +121,7 @@ wss.on("connection", (ws) => {
           ws.send(JSON.stringify(response));
           return;
         }
+
         updateResponse(404, "Couldn't update the players ready state!", {
           action: "error",
           name: payload.name,
@@ -128,8 +131,16 @@ wss.on("connection", (ws) => {
 
       case "appendAlbums":
         game = games.find((game) => game.code === payload.code);
-        game.pushAlbums(payload.albums);
-        console.log(game.albums);
+        const existingAlbums = game.pushAlbums(payload.albums);
+        console.log(existingAlbums)
+        existingAlbums.length === 0
+          ? updateResponse(200, "All albums added!", { action: data.action })
+          : updateResponse(
+              207,
+              `${existingAlbums.length} albums were not added`,
+              { action: data.action, existingAlbums }
+            );
+        ws.send(JSON.stringify(response));
         break;
     }
   });

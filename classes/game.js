@@ -43,9 +43,15 @@ class Game {
   }
 
   pushAlbums(newAlbums) {
-    for (const album of newAlbums) {
-      if (!this.albums.includes(album)) this.albums.push(album);
+    const existingAlbums = [];
+    for (const newAlbum of newAlbums) {
+      if (!this.albums.some((album) => album.id === newAlbum.id)) {
+        this.albums.push(newAlbum);
+        continue;
+      }
+      existingAlbums.push(newAlbum);
     }
+    return existingAlbums;
   }
 }
 
