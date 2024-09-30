@@ -1,4 +1,4 @@
-require('dotenv').config()
+require("dotenv").config();
 const express = require("express");
 const WebSocket = require("ws");
 const Player = require("./classes/player.js");
@@ -15,7 +15,6 @@ const games = [];
 
 const spotify = new Spotify(process.env.CLIENT_ID, process.env.SECRET);
 spotify.getNewAuthToken();
-
 
 // WebSocket event handling
 wss.on("connection", (ws) => {
@@ -58,7 +57,7 @@ wss.on("connection", (ws) => {
           updateResponse(200, "A new player was created", {
             action: data.action,
             players: playerNames,
-            code : payload.code,
+            code: payload.code,
           });
 
           player.ws.send(JSON.stringify(response));
@@ -105,12 +104,18 @@ wss.on("connection", (ws) => {
       case "playerReady":
         game = games.find((game) => game.code === payload.code);
         if (!game) {
-          updateResponse(404, "Game not found", { action: "error", code : payload.code });
+          updateResponse(404, "Game not found", {
+            action: "error",
+            code: payload.code,
+          });
           ws.send(JSON.stringify(response));
           return;
         }
         if (game.setReady(payload.name)) {
-          updateResponse(200, "Player ready!", { action: data.action, name: payload.name });
+          updateResponse(200, "Player ready!", {
+            action: data.action,
+            name: payload.name,
+          });
           ws.send(JSON.stringify(response));
           return;
         }
@@ -120,6 +125,12 @@ wss.on("connection", (ws) => {
         });
         ws.send(JSON.stringify(response));
         return;
+
+      case "appendAlbums":
+        game = games.find((game) => game.code === payload.code);
+        game.pushAlbums(payload.albums);
+        console.log(game.albums);
+        break;
     }
   });
 
