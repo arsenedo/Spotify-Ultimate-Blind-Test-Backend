@@ -8,6 +8,7 @@ class Spotify {
     this.secret = secret;
   }
 
+  // API calls
   async getNewAuthToken() {
     await axios
       .post(
@@ -29,18 +30,30 @@ class Spotify {
         return Promise.reject(e);
       });
 
-      this.saveToken(JSON.stringify(this.authToken));
+    this.saveToken(JSON.stringify(this.authToken));
+  }
+
+  async getRandomSongFromAlbum(id) {
+    const items = await axios.get(`https://api.spotify.com/v1/albums/${id}/tracks`, {
+      headers: {
+        Authorization: `${this.authToken.token_type} ${this.authToken.access_token}`
+      }
+    }).then(resp => resp.data.items);
+
+    const song = items[Math.floor(Math.random() * items.length)];
+
+    return song;
   }
 
   saveToken(authToken) {
-    if (!authToken) return 
+    if (!authToken) return
     fs.writeFile('authToken.json', authToken, err => {
-        if (err) {
-            console.error(err);
-        } else {
-            console.log("Auth token saved successfully!");
-            return
-        }
+      if (err) {
+        console.error(err);
+      } else {
+        console.log("Auth token saved successfully!");
+        return
+      }
     });
   }
 }

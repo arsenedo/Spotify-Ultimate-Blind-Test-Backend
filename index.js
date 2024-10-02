@@ -19,7 +19,7 @@ spotify.getNewAuthToken();
 // WebSocket event handling
 wss.on("connection", (ws) => {
   // Event listener for incoming messages
-  ws.on("message", (e) => {
+  ws.on("message", async (e) => {
     const response = {
       code: "500",
       msg: "internal server error",
@@ -67,7 +67,7 @@ wss.on("connection", (ws) => {
         // TODO PARSE PAYLOAD
         const host = new Player(0, payload.name, ws);
         const code = generateCode();
-        game = new Game(host, code);
+        game = new Game(host, code, spotify);
         games.push(game);
 
         // Response
@@ -144,7 +144,6 @@ wss.on("connection", (ws) => {
       case "appendAlbums":
         game = findGame(payload.code);
         const existingAlbums = game.pushAlbums(payload.albums);
-        console.log(existingAlbums)
         existingAlbums.length === 0
           ? updateResponse(200, "All albums added!", { action: data.action })
           : updateResponse(
@@ -155,8 +154,10 @@ wss.on("connection", (ws) => {
         ws.send(JSON.stringify(response));
         break;
 
+      // Async handlers
       case "playerLoaded":
         game = findGame(payload.code);
+
         if (!game) {
           updateResponse(404, "Game not found", {
             action: "error",
@@ -166,16 +167,24 @@ wss.on("connection", (ws) => {
           return;
         }
 
-        if(game.setPlayerLoaded(payload.name)) {
-          updateResponse(200, "Player loaded successfuly!", {action : data.action});
+        if (game.setLoaded(payload.name)) {
+          updateResponse(200, "Player loaded successfuly!", { action: data.action });
           ws.send(JSON.stringify(response));
 
           // Check if all players loaded
           if (game.arePlayersLoaded()) {
-            updateResponse(200, "All players are ready!", {
-              action: "allReady",
-            });
+            game.allLoaded = true;
+
+            const song = await game.getRandomSongFromRandomAlbum();
+            console.log(song)
+            // Broadcast the song to everyone in the game
             for (const player of game.players) {
+              // Response
+              updateResponse(200, "Song found!", {
+                action: "songReceive",
+                song,
+              });
+
               player.ws.send(JSON.stringify(response));
             }
           }

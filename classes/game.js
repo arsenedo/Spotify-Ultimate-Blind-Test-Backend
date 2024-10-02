@@ -2,10 +2,13 @@ class Game {
   players = [];
   albums = [];
   isStarted = false; // Counts as started when the host starts the data pick sequence
+  allLoaded = false;
+  allSongReceived = false;
 
-  constructor(host, code) {
+  constructor(host, code, spotifyController) {
     this.code = code;
     this.host = host;
+    this.spotifyController = spotifyController;
 
     this.addPlayer(this.host);
   }
@@ -53,6 +56,7 @@ class Game {
     this.isStarted = true;
   }
 
+  // Albums
   pushAlbums(newAlbums) {
     const existingAlbums = [];
     for (const newAlbum of newAlbums) {
@@ -63,6 +67,18 @@ class Game {
       existingAlbums.push(newAlbum);
     }
     return existingAlbums;
+  }
+
+  getRandomAlbum() {
+    return this.albums[Math.floor(Math.random()*this.albums.length)]
+  }
+
+  async getRandomSongFromRandomAlbum() {
+    const album = this.getRandomAlbum();
+
+    const song = await this.spotifyController.getRandomSongFromAlbum(album.id);
+    
+    return song;
   }
 
   getPlayer(name) {
