@@ -154,6 +154,21 @@ wss.on("connection", (ws) => {
         ws.send(JSON.stringify(response));
         break;
 
+      case "songPicked":
+        game = findGame(payload.code);
+        const playerName = payload.name;
+        const song = payload.song;
+
+        const score = game.checkPlayerFinding(playerName, song);
+        if(score === -1) {
+          updateResponse(404, "Player not found", { action: "error", name : playerName });
+          ws.send(JSON.stringify(response));
+          return;
+        }
+
+        updateResponse(200, "Player score updated", { action: data.action, score});
+        ws.send(JSON.stringify(response));
+        break;
       // Async handlers
       case "playerLoaded":
         game = findGame(payload.code);
@@ -176,7 +191,6 @@ wss.on("connection", (ws) => {
             game.allLoaded = true;
 
             const song = await game.getRandomSongFromRandomAlbum();
-            console.log(song)
             // Broadcast the song to everyone in the game
             for (const player of game.players) {
               // Response
@@ -187,6 +201,14 @@ wss.on("connection", (ws) => {
 
               player.ws.send(JSON.stringify(response));
             }
+
+            setTimeout(() => {
+              game.nextRound();
+              updateResponse(200, "Round over!", { action : "roundOver"});
+              for (const player of game.players) {
+                player.ws.send(JSON.stringify(response));
+              }
+            }, 25000);
           }
 
           return

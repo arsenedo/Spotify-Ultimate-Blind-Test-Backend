@@ -2,8 +2,9 @@ class Game {
   players = [];
   albums = [];
   isStarted = false; // Counts as started when the host starts the data pick sequence
-  allLoaded = false;
-  allSongReceived = false;
+  allLoaded = false; // All players loaded in the round (TO CLEAR)
+  allSongReceived = false; // All players sent the song (TO CLEAR)
+  songToFind = ""; // (TO CLEAR)
 
   constructor(host, code, spotifyController) {
     this.code = code;
@@ -77,8 +78,22 @@ class Game {
     const album = this.getRandomAlbum();
 
     const song = await this.spotifyController.getRandomSongFromAlbum(album.id);
+
+    this.songToFind = song.name;
     
     return song;
+  }
+
+  checkPlayerFinding(playerName, song) {
+    const player = this.getPlayer(playerName);
+    if(player) {
+      player.score += song.toLowerCase() === this.songToFind.toLowerCase() ? 500 : 0;
+
+      return player.score;
+    }
+
+    return -1
+
   }
 
   getPlayer(name) {
@@ -86,6 +101,17 @@ class Game {
       (player) => player.name.toLowerCase() === name.toLowerCase()
     );
     return player;
+  }
+
+  nextRound() {
+    this.allLoaded = false;
+    this.allSongReceived = false;
+    this.songToFind = "";
+
+    for (const player of this.players) {
+      player.ready = false;
+      player.loaded = false;
+    }
   }
 }
 
