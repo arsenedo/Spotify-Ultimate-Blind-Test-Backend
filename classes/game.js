@@ -5,6 +5,8 @@ class Game {
   allLoaded = false; // All players loaded in the round (TO CLEAR)
   allSongReceived = false; // All players sent the song (TO CLEAR)
   songToFind = ""; // (TO CLEAR)
+  rounds = 2;
+  currRound = 1;
 
   constructor(host, code, spotifyController) {
     this.code = code;
@@ -107,10 +109,26 @@ class Game {
     this.allLoaded = false;
     this.allSongReceived = false;
     this.songToFind = "";
+    this.currRound++;
 
     for (const player of this.players) {
       player.loaded = false;
     }
+  }
+
+  gameOver() {
+    this.isStarted = false;
+    const gameData = [];
+    for (const player of this.players) {
+      const playerStats = {
+        name : player.name,
+        score : player.score,
+      }
+
+      gameData.push(playerStats);
+    }
+
+    return gameData;
   }
 }
 

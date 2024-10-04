@@ -203,8 +203,16 @@ wss.on("connection", (ws) => {
             }
 
             setTimeout(() => {
-              game.nextRound();
-              updateResponse(200, "Round over!", { action : "roundOver"});
+              if (game.currRound < game.rounds) {
+                game.nextRound();
+                updateResponse(200, "Round over!", { action : "roundOver"});
+                for (const player of game.players) {
+                  player.ws.send(JSON.stringify(response));
+                }
+                return
+              }
+              const finalStats = game.gameOver();
+              updateResponse(200, "Game over!", { action : "gameOver", finalStats });
               for (const player of game.players) {
                 player.ws.send(JSON.stringify(response));
               }
