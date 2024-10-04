@@ -109,7 +109,6 @@ class Game {
     this.songToFind = "";
 
     for (const player of this.players) {
-      player.ready = false;
       player.loaded = false;
     }
   }
