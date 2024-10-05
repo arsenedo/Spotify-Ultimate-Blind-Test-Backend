@@ -128,6 +128,8 @@ class Game {
       gameData.push(playerStats);
     }
 
+    gameData.sort((a, b) => a.score - b.score).reverse();
+
     return gameData;
   }
 }
