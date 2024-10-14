@@ -1,9 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const WebSocket = require("ws");
-const Player = require("./classes/player.js");
-const Game = require("./classes/game.js");
-const Spotify = require("./classes/spotify.js");
+const Player = require("../classes/player.js");
+const Game = require("../classes/game.js");
+const Spotify = require("../classes/spotify.js");
 const app = express();
 const port = 3000;
 
