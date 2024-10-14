@@ -259,3 +259,7 @@ wss.on("connection", (ws) => {
 app.listen(port, () => {
   console.log(`Backend server listening on port ${port}`);
 });
+
+app.get("/", (req, res) => res.send("Express on Vercel"));
+
+module.exports = app;
