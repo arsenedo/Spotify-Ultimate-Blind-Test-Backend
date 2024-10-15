@@ -4,7 +4,7 @@
   "description": "skibidi",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node index.js",
     "pididi": "npx nodemon start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
