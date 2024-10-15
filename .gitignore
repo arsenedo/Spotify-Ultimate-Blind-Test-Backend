@@ -11,5 +11,3 @@ authToken.json
 .vscode
 .fleet
 .idea
-.vercel
-.env*.local

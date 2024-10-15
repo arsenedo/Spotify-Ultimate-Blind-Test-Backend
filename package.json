@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "skibidi",
-  "main": "./api/index.js",
+  "main": "index.js",
   "scripts": {
     "pididi": "npx nodemon start",
     "test": "echo \"Error: no test specified\" && exit 1"
