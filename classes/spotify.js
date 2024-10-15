@@ -42,7 +42,13 @@ class Spotify {
 
     const song = items[Math.floor(Math.random() * items.length)];
 
-    return song;
+    const track = await axios.get(`https://api.spotify.com/v1/tracks/${song.id}`, {
+      headers: {
+        Authorization: `${this.authToken.token_type} ${this.authToken.access_token}`
+      }
+    }).then(resp => resp.data);
+
+    return track;
   }
 
   saveToken(authToken) {
