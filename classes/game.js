@@ -5,7 +5,7 @@ class Game {
   allLoaded = false; // All players loaded in the round (TO CLEAR)
   allSongReceived = false; // All players sent the song (TO CLEAR)
   songToFind = ""; // (TO CLEAR)
-  rounds = 2;
+  rounds = 5;
   currRound = 1;
 
   constructor(host, code, spotifyController) {
