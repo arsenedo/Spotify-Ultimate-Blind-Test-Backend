@@ -259,3 +259,8 @@ wss.on("connection", (ws) => {
 app.listen(port, () => {
   console.log(`Backend server listening on port ${port}`);
 });
+
+app.get("/", (req, resp) => {
+  req.send("Server updated!");
+  spotify.getNewAuthToken();
+});
