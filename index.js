@@ -4,11 +4,11 @@ const WebSocket = require("ws");
 const Player = require("./classes/player.js");
 const Game = require("./classes/game.js");
 const Spotify = require("./classes/spotify.js");
-const app = express();
-const port = 3000;
+//const app = express();
+const port = process.env.PORT || 8080;
 
 // Initialize WebSocket server
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port : port });
 
 // Array with all games
 const games = [];
@@ -256,6 +256,6 @@ wss.on("connection", (ws) => {
   });
 });
 
-app.listen(port, () => {
+/*app.listen(port, () => {
   console.log(`Backend server listening on port ${port}`);
-});
+});*/
